@@ -1,6 +1,12 @@
 import numpy as np
 from scipy.linalg import eigh
 
+import numpy as np
+from scipy.linalg import eigh
+
+import numpy as np
+from scipy.linalg import eigh
+
 class LinearDiscriminantAnalysis:
     
     def __init__(self, n_components):
@@ -36,7 +42,7 @@ class LinearDiscriminantAnalysis:
         num_samples = trainX.shape[0]
         # Keep track of class means and covariances
         self.classMeans = np.full([numUniqueClassLabels, num_features], np.nan)
-        self.classScaterMats = np.full([numUniqueClassLabels, num_features, num_features], np.nan)
+        self.classScatterMats = np.full([numUniqueClassLabels, num_features, num_features], np.nan)
         # Compute means and covariance matrices for each class
         for i in range(numUniqueClassLabels):
             currClassLabel = self.uniqueClassLabels[i]
@@ -50,10 +56,10 @@ class LinearDiscriminantAnalysis:
             # Identify class scatter matrices (n_features, n_features) 
             # By setting bias = true, we normalize by N instead of N-1 (Bessel's correction). 
             # rowvar = false means each row is a sample
-            self.classScaterMats[i, :, :] = np.cov(currClassSamples, rowvar=False, bias=True)* self.numPerClass[i]
+            self.classScatterMats[i, :, :] = self.numPerClass[i]*np.cov(currClassSamples, rowvar=False, bias=True)
         self.totalMeanVector = np.mean(trainX, axis=0)
         # Generate within-class scatter matrix which is the sum of all class' scatter matrices
-        within_class_scatter = np.sum(self.classScaterMats, axis=0)
+        within_class_scatter = np.sum(self.classScatterMats, axis=0)
         # Generate between-class scatter matrix
         between_class_scatter = np.zeros((num_features, num_features))
         for i in range(numUniqueClassLabels):
@@ -64,7 +70,20 @@ class LinearDiscriminantAnalysis:
         self.fitted = True
         
     def transform(self, X):
+        """
+        Projects data to lower dimensional subspaces found during model fitting
+        
+        Parameters
+        ---------
+        X:
+            Array of data you'd like to project on to dimensions found during fitting (n_samples, n_features) 
+        
+        Returns 
+        ---------
+        proj: 
+            Data projections 
+        """
         if self.fitted:
-            return randomData@(self.evecs[-model.n_components:].T)
+            return X@(self.evecs[-self.n_components:].T)
         else:
             raise Exception('Model has not been fitted yet!')
