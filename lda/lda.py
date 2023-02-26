@@ -1,12 +1,6 @@
 import numpy as np
 from scipy.linalg import eigh
 
-import numpy as np
-from scipy.linalg import eigh
-
-import numpy as np
-from scipy.linalg import eigh
-
 class LinearDiscriminantAnalysis:
     
     def __init__(self, n_components):
