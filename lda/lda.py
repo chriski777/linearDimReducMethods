@@ -59,16 +59,18 @@ class LinearDiscriminantAnalysis:
             self.classScatterMats[i, :, :] = self.numPerClass[i]*np.cov(currClassSamples, rowvar=False, bias=True)
         self.totalMeanVector = np.mean(trainX, axis=0)
         # Generate within-class scatter matrix which is the sum of all class' scatter matrices
-        within_class_scatter = np.sum(self.classScatterMats, axis=0)
+        self.within_class_scatter = np.sum(self.classScatterMats, axis=0)
         # Generate between-class scatter matrix
-        between_class_scatter = np.zeros((num_features, num_features))
+        # Within-class scatter matrix and between-class scatter matrix differ from these by a factor of num_samples
+        # eigenvalues found are identical to sklearn.lda eigensolver implementation though 
+        self.between_class_scatter = np.zeros((num_features, num_features))
         for i in range(numUniqueClassLabels):
-            v = self.classMeans[i,:] - self.totalMeanVector
-            between_class_scatter += self.numPerClass[i]*(v @ v.T)
+            v = (self.classMeans[i,:] - self.totalMeanVector)[:,np.newaxis]
+            self.between_class_scatter += self.numPerClass[i]*(v @ v.T)
         # Eigenvalues and eigenvectors are in ascending order
-        self.evals, self.evecs = eigh(between_class_scatter, within_class_scatter)
+        self.evals, self.evecs = eigh(self.between_class_scatter, self.within_class_scatter)
         self.fitted = True
-        
+
     def transform(self, X):
         """
         Projects data to lower dimensional subspaces found during model fitting
