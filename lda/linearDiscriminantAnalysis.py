@@ -62,10 +62,10 @@ class Model:
             v = (self.classMeans[i,:] - self.totalMeanVector)[:,np.newaxis]
             self.between_class_scatter += self.numPerClass[i]*(v @ v.T)
         #find projection vector and project trainX
-        # If Sw is singular, use the least squres estimate instead of throwing an error 
+        # If Sw is singular, use the least squres estimate of the inverse instead of throwing an error 
         invSwSb, _, _ , _= lstsq(self.within_class_scatter, self.between_class_scatter)
         U, _, _ = np.linalg.svd(invSwSb)
-        self.evecs = U
+        self.loadings = U
         self.fitted = True
 
     def transform(self, X):
@@ -83,6 +83,7 @@ class Model:
             Data projections 
         """
         if self.fitted:
-            return X@(self.evecs[-self.n_components:].T)
+            # Loadings are in ascending order
+            return X@(self.loadings[:,0:self.n_components])
         else:
             raise Exception('Model has not been fitted yet!')
