@@ -1,7 +1,7 @@
 import numpy as np
-from scipy.linalg import eigh
+from scipy.linalg import lstsq
 
-class LinearDiscriminantAnalysis:
+class Model:
     
     def __init__(self, n_components):
         if n_components != 1:
@@ -61,8 +61,11 @@ class LinearDiscriminantAnalysis:
         for i in range(numUniqueClassLabels):
             v = (self.classMeans[i,:] - self.totalMeanVector)[:,np.newaxis]
             self.between_class_scatter += self.numPerClass[i]*(v @ v.T)
-        # Eigenvalues and eigenvectors are in ascending order
-        self.evals, self.evecs = eigh(self.between_class_scatter, self.within_class_scatter)
+        #find projection vector and project trainX
+        # If Sw is singular, use the least squres estimate instead of throwing an error 
+        invSwSb, _, _ , _= lstsq(self.within_class_scatter, self.between_class_scatter)
+        U, _, _ = np.linalg.svd(invSwSb)
+        self.evecs = U
         self.fitted = True
 
     def transform(self, X):
