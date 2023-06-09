@@ -65,7 +65,7 @@ class Model:
         # If Sw is singular, use the least squres estimate of the inverse instead of throwing an error 
         invSwSb, _, _ , _= lstsq(self.within_class_scatter, self.between_class_scatter)
         U, _, _ = np.linalg.svd(invSwSb)
-        self.loadings = U
+        self.scalings_ = U
         self.fitted = True
 
     def transform(self, X):
@@ -84,6 +84,6 @@ class Model:
         """
         if self.fitted:
             # Loadings are in ascending order
-            return X@(self.loadings[:,0:self.n_components])
+            return X@(self.scalings_[:,0:self.n_components])
         else:
             raise Exception('Model has not been fitted yet!')
